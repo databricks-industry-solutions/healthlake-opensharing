@@ -5,11 +5,12 @@ import io
 import json
 import os
 import sys
+import time
 import types
 import urllib.parse
 
 import pytest
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, EndpointConnectionError
 from fastavro import parse_schema, writer
 from fastapi.testclient import TestClient
 
@@ -306,6 +307,25 @@ def test_a_revoked_store_is_not_kept_because_another_account_failed(env):
     assert served(env) == [BETA]
 
 
+@pytest.mark.parametrize("error", [
+    ClientError({"Error": {"Code": "ThrottlingException", "Message": "slow down"}}, "GetDatabase"),
+    EndpointConnectionError(endpoint_url="https://glue.us-east-1.amazonaws.com"),
+])
+def test_a_failed_lookup_keeps_that_store_and_still_discovers_the_others(env, error):
+    glue = env["glue"]["role-a"]
+    lookup = glue.get_database
+
+    def failing(Name):
+        raise error
+
+    glue.get_database = failing
+    assert served(env) == [BETA]  # cold start: the other stores are still served
+    glue.get_database = lookup
+    env["server"]._stores["items"] = env["server"].discover()
+    glue.get_database = failing
+    assert served(env) == [ALPHA, BETA]  # later: it keeps what it served before
+
+
 def unreachable(monkeypatch, env, bad_role):
     server, real = env["server"], env["server"].aws
 
@@ -385,6 +405,29 @@ def test_discovery_refreshes_in_the_background(env):
     assert sorted(server.stores()) == ["gamma"]
 
 
+def test_a_failed_refresh_waits_a_full_interval_before_retrying(env):
+    server = env["server"]
+    server.stores()
+    attempts = []
+
+    def failing():
+        attempts.append(1)
+        raise RuntimeError("AWS is down")
+
+    server.discover = failing
+    server._stores["at"] = 0
+    server.stores()
+    for _ in range(50):  # the refresh runs in the background and holds the lock until it ends
+        if server._discovery_lock.acquire(blocking=False):
+            server._discovery_lock.release()
+            break
+        time.sleep(0.05)
+    server.stores()
+    server.stores()
+    assert attempts == [1]
+    assert sorted(server.stores()) == [ALPHA, BETA]  # the previous list is still served
+
+
 def test_stores_setting_selects_and_renames_by_id_or_link(monkeypatch, capsys):
     env = make_env(monkeypatch, STORES=f"fhir={ALPHA_ID},My-Copy={BETA_LINK},{BETA_ID},missing=nope,byname=alpha")
     schemas = env["client"].get("/delta-sharing/shares/healthlake/schemas").json()["items"]
@@ -410,6 +453,8 @@ def test_list_endpoints_paginate(env):
     assert second["items"][0]["schema"] == BETA
     assert "nextPageToken" not in second
     assert c.get("/delta-sharing/shares", params={"maxResults": "x"}).status_code == 400
+    negative = env["server"].encode_token({"o": -1})
+    assert c.get("/delta-sharing/shares/healthlake/all-tables", params={"pageToken": negative}).status_code == 400
 
 
 def test_metadata_converts_schema_and_is_cached_per_snapshot(env):
@@ -590,6 +635,19 @@ def test_tables_with_iceberg_delete_files_fail_loudly(env):
         env["objects"], ALPHA_DIR, "v2", ["d.parquet"], 2, 1_800_000_000_000, delete_files=["d-deletes.parquet"])
     response = query(env)
     assert response.status_code == 400  # not 5xx, which clients would keep retrying
+    assert response.json()["errorCode"] == "UNSUPPORTED_TABLE"
+
+
+def test_snapshots_with_inline_manifests_fail_loudly(env):
+    location = add_snapshot(env["objects"], ALPHA_DIR, "v2", ["d.parquet"], 2, 1_800_000_000_000)
+    meta = json.loads(env["objects"][location])
+    snap = meta["snapshots"][0]
+    del snap["manifest-list"]
+    snap["manifests"] = [f"{ALPHA_DIR}/v2-manifest.avro"]  # Iceberg v1 allows this instead of a manifest list
+    env["objects"][location] = json.dumps(meta).encode()
+    env["glue"]["role-a"].databases[ALPHA_LINK]["tables"]["patient"] = location
+    response = query(env)
+    assert response.status_code == 400
     assert response.json()["errorCode"] == "UNSUPPORTED_TABLE"
 
 
