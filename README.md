@@ -332,14 +332,17 @@ Revoke the Lake Formation grants for each data store before deleting the role; L
 The tests run the server against in-memory fakes of Glue, Lake Formation, HealthLake, and S3, and need no cloud access:
 
 ```bash
-python -m venv .venv && .venv/bin/pip install -r app/requirements.txt && .venv/bin/pip install pytest httpx
+python -m venv .venv && .venv/bin/pip install --require-hashes -r app/requirements.txt -r requirements-dev.txt
 .venv/bin/python -m pytest tests -q
 ```
 
-`app/requirements.txt` is a hashed lockfile generated from `app/requirements.in`:
+CI (`.github/workflows/ci.yml`) runs the tests, `pip-audit` on `app/requirements.txt`, and a `gitleaks` scan of the history on every pull request, and publishes a GitHub release for each `v*` tag.
+
+`app/requirements.txt` and `requirements-dev.txt` are hashed lockfiles generated from their `.in` files:
 
 ```bash
 uv pip compile app/requirements.in --universal --python-version 3.11 --generate-hashes -o app/requirements.txt
+uv pip compile requirements-dev.in -c app/requirements.txt --universal --python-version 3.11 --generate-hashes -o requirements-dev.txt
 ```
 
 ## Project support
@@ -359,3 +362,4 @@ This project is provided for your exploration only and is not formally supported
 | urllib3 | HTTP connection pooling to S3 | MIT | https://github.com/urllib3/urllib3 |
 | Starlette | Web framework under FastAPI | BSD-3-Clause | https://github.com/encode/starlette |
 | Uvicorn | ASGI web server | BSD-3-Clause | https://github.com/encode/uvicorn |
+| certifi | CA certificates for HTTPS, installed with the Databricks SDK | MPL-2.0 | https://github.com/certifi/python-certifi |
