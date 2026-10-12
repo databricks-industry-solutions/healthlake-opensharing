@@ -20,7 +20,7 @@ import urllib3
 from botocore.auth import S3SigV4QueryAuth
 from botocore.awsrequest import AWSRequest
 from botocore.credentials import Credentials
-from botocore.exceptions import ClientError
+from botocore.exceptions import BotoCoreError, ClientError
 from databricks.sdk.core import Config as DatabricksConfig
 from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.middleware.gzip import GZipMiddleware
@@ -267,14 +267,17 @@ def resolve(name, link, roles, failed):
             return (_stores["items"] or {}).get(name)
         try:
             database = glue.get_database(Name=link)["Database"]
-        except ClientError as e:
-            code = e.response["Error"]["Code"]
+        except (ClientError, BotoCoreError) as e:
+            code = e.response["Error"]["Code"] if isinstance(e, ClientError) else None
             if code == "AccessDeniedException":  # data store exists but this role has no grant on it yet
                 print(f"WARNING: skipping data store '{name}': no Lake Formation DESCRIBE on '{link}'")
                 return None
-            if code != "EntityNotFoundException":
-                raise
-            continue
+            if code == "EntityNotFoundException":
+                continue
+            # Throttling or a timeout says nothing about the data store, so it keeps
+            # what it served before and the other data stores are still discovered.
+            print(f"WARNING: could not look up '{link}' for data store '{name}', keeping what it served before: {e}")
+            return (_stores["items"] or {}).get(name)
         target = database.get("TargetDatabase")
         if not target:
             print(f"WARNING: skipping '{name}': Glue database '{link}' is not a HealthLake resource link")
@@ -313,6 +316,7 @@ def stores():
             try:
                 _stores.update(at=time.time(), items=discover())
             except Exception as e:
+                _stores["at"] = time.time()  # retry after the usual interval, not on every request
                 print(f"WARNING: data store discovery failed, keeping the previous list: {e}")
             finally:
                 _discovery_lock.release()
@@ -409,6 +413,9 @@ def read_snapshot(credentials, metadata_location):
     snap = next((s for s in meta.get("snapshots", []) if s["snapshot-id"] == snap_id), None)
     if snap is None:  # table exists but has no committed data yet
         return schema, [], 0
+    if "manifest-list" not in snap:  # Iceberg v1 also allows listing manifests inline
+        raise Unsupported("this table's snapshot lists its manifests inline instead of in a manifest list, "
+                          "which the server does not support")
     files = []
     for m in avro_reader(io.BytesIO(s3_get(credentials, snap["manifest-list"]))):
         for entry in avro_reader(io.BytesIO(s3_get(credentials, m["manifest_path"]))):
@@ -512,6 +519,8 @@ def page(items, params):
         start = int(decode_token(params["pageToken"])["o"]) if params.get("pageToken") else 0
     except (KeyError, TypeError, ValueError) as e:
         raise BadRequest("maxResults or pageToken is not valid") from e
+    if start < 0:
+        raise BadRequest("pageToken is not valid")
     end = start + max_results if max_results > 0 else len(items)
     result = {"items": items[start:end]}
     if end < len(items):
