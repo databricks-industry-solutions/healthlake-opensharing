@@ -336,7 +336,7 @@ python -m venv .venv && .venv/bin/pip install --require-hashes -r app/requiremen
 .venv/bin/python -m pytest tests -q
 ```
 
-CI (`.github/workflows/ci.yml`) runs the tests, `pip-audit` on `app/requirements.txt`, and a `gitleaks` scan of the history on every pull request, and publishes a GitHub release for each `v*` tag.
+CI (`.github/workflows/ci.yml`) runs the tests, `pip-audit` on `app/requirements.txt`, and a `gitleaks` scan of the history on every pull request and every push to `main`.
 
 `app/requirements.txt` and `requirements-dev.txt` are hashed lockfiles generated from their `.in` files:
 
