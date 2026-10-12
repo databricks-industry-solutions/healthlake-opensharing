@@ -102,6 +102,18 @@ databricks bundle deploy
 databricks bundle run healthlake_opensharing
 ```
 
+To deploy the same way every time, for example from CI/CD, pin these values under the `default` target in `databricks.yml` instead of exporting them, or set the same `BUNDLE_VAR_*` variables in your CI system:
+
+```yaml
+targets:
+  default:
+    default: true
+    variables:
+      aws_region: us-east-1
+      aws_role_arns: arn:aws:iam::123456789012:role/healthlake-opensharing-reader
+      recipient_sp_application_id: <recipient application id>
+```
+
 ### 3. Let the app into AWS
 
 The app logs its identity at startup. These three values go into the IAM trust policy:
