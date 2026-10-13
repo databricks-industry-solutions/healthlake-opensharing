@@ -355,11 +355,11 @@ This project is provided for your exploration only and is not formally supported
 
 | Library | Purpose | License | Source |
 |---|---|---|---|
-| boto3, botocore | AWS API calls and request signing | Apache-2.0 | https://github.com/boto/boto3 |
-| Databricks SDK for Python | Databricks identity and OIDC token | Apache-2.0 | https://github.com/databricks/databricks-sdk-py |
-| FastAPI | OpenSharing protocol server | MIT | https://github.com/fastapi/fastapi |
+| boto3 | AWS API calls and request signing | Apache-2.0 | https://github.com/boto/boto3 |
+| databricks-sdk | Databricks identity and OIDC token | Apache-2.0 | https://github.com/databricks/databricks-sdk-py |
+| fastapi | OpenSharing protocol server | MIT | https://github.com/fastapi/fastapi |
 | fastavro | Reading Iceberg manifest files | MIT | https://github.com/fastavro/fastavro |
 | urllib3 | HTTP connection pooling to S3 | MIT | https://github.com/urllib3/urllib3 |
-| Starlette | Web framework under FastAPI | BSD-3-Clause | https://github.com/encode/starlette |
-| Uvicorn | ASGI web server | BSD-3-Clause | https://github.com/encode/uvicorn |
-| certifi | CA certificates for HTTPS, installed with the Databricks SDK | MPL-2.0 | https://github.com/certifi/python-certifi |
+| uvicorn | ASGI web server | BSD-3-Clause | https://github.com/Kludex/uvicorn |
+
+These are the app's direct dependencies, the same ones [NOTICE.md](NOTICE.md) lists. The repository includes no third-party code: pip installs these libraries and their own dependencies from PyPI when the app is deployed, each under its own license.
