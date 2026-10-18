@@ -1,4 +1,4 @@
-boto3==1.43.109
+boto3==1.43.111
 databricks-sdk==0.146.0
 fastapi==0.142.2
 fastavro==1.12.2
