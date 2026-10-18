@@ -367,9 +367,9 @@ cryptography==50.0.2 \
     --hash=sha256:fa8f5efb344d6908a1ce62f4a24e2e5780f825d6f53f5f50ec5ffacac72936cb \
     --hash=sha256:fdd28f912fccfec1846a94e2e1e8f9b0012f557f0c46fe4f3eb0d7a87afcf90b
     # via google-auth
-databricks-sdk==0.146.0 \
-    --hash=sha256:7096fe03e801c24179efbb314870286225fbb5c73151b11aabf7bab53e0e8dd6 \
-    --hash=sha256:e744fff01571f0202ca66816638aaa3d9a2ecc08b7af3a5c8c6300e931684b42
+databricks-sdk==0.151.0 \
+    --hash=sha256:61a3d339eb56c95c64945a3feab2c8c910f5ed212ed04bf7f866c37dae9bd2d0 \
+    --hash=sha256:fadd9da86d5e4ba991f7507a90dc099ee4ca10dad2b36b594654dacdb2b34b63
     # via -r requirements.in
 fastapi==0.142.2 \
     --hash=sha256:06366626f2e70576367714d9ab2fe8472e6c8456dba69b399f9f797ab5e92570 \
