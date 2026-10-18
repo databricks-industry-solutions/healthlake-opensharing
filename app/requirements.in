@@ -1,5 +1,5 @@
 boto3==1.43.109
-databricks-sdk==0.146.0
+databricks-sdk==0.151.0
 fastapi==0.142.2
 fastavro==1.12.2
 urllib3==2.8.0
