@@ -371,9 +371,9 @@ databricks-sdk==0.146.0 \
     --hash=sha256:7096fe03e801c24179efbb314870286225fbb5c73151b11aabf7bab53e0e8dd6 \
     --hash=sha256:e744fff01571f0202ca66816638aaa3d9a2ecc08b7af3a5c8c6300e931684b42
     # via -r requirements.in
-fastapi==0.142.2 \
-    --hash=sha256:06366626f2e70576367714d9ab2fe8472e6c8456dba69b399f9f797ab5e92570 \
-    --hash=sha256:bd5f4d81f1e93a88bcd77caf4dfe3c2dbffc3805407a0007e9a114c18b3a670b
+fastapi==0.143.0 \
+    --hash=sha256:1acffe48206a80917cf7dac21992b5c44b25384e8902bf745c1fd9dabcf6c51f \
+    --hash=sha256:3e9395fd35276425b61b516a31fdd7c77fe2af83e41b4da22e30696fb1304c5d
     # via -r requirements.in
 fastavro==1.12.2 \
     --hash=sha256:030f17eb4c7978538a31b55dea451ceace851a88dc9816b1923f8fb8a260db4c \
