@@ -15,7 +15,7 @@ anyio==4.15.1 \
 boto3==1.43.109 \
     --hash=sha256:703a81baed186d31e27cf50065d25a9faeb704f009e7c56b0f002ca52a328896 \
     --hash=sha256:c829bc3352e1e3922d8fe1db10b697182ac411b64ce5fc3acb0a06a29837417e
-    # via -r requirements.in
+    # via -r app/requirements.in
 botocore==1.43.114 \
     --hash=sha256:d1c441a22e93e158de5b1e026205f5d6d67a4545d10540c5090c62dccb3a9eca \
     --hash=sha256:f366fa4db518775632ad1eb128cd8203ca46396cecf37209d904f0bbc049ce90
@@ -367,14 +367,14 @@ cryptography==50.0.2 \
     --hash=sha256:fa8f5efb344d6908a1ce62f4a24e2e5780f825d6f53f5f50ec5ffacac72936cb \
     --hash=sha256:fdd28f912fccfec1846a94e2e1e8f9b0012f557f0c46fe4f3eb0d7a87afcf90b
     # via google-auth
-databricks-sdk==0.146.0 \
-    --hash=sha256:7096fe03e801c24179efbb314870286225fbb5c73151b11aabf7bab53e0e8dd6 \
-    --hash=sha256:e744fff01571f0202ca66816638aaa3d9a2ecc08b7af3a5c8c6300e931684b42
-    # via -r requirements.in
+databricks-sdk==0.151.0 \
+    --hash=sha256:61a3d339eb56c95c64945a3feab2c8c910f5ed212ed04bf7f866c37dae9bd2d0 \
+    --hash=sha256:fadd9da86d5e4ba991f7507a90dc099ee4ca10dad2b36b594654dacdb2b34b63
+    # via -r app/requirements.in
 fastapi==0.142.2 \
     --hash=sha256:06366626f2e70576367714d9ab2fe8472e6c8456dba69b399f9f797ab5e92570 \
     --hash=sha256:bd5f4d81f1e93a88bcd77caf4dfe3c2dbffc3805407a0007e9a114c18b3a670b
-    # via -r requirements.in
+    # via -r app/requirements.in
 fastavro==1.12.2 \
     --hash=sha256:030f17eb4c7978538a31b55dea451ceace851a88dc9816b1923f8fb8a260db4c \
     --hash=sha256:03614131093a32c90c8fd95ff356c316752b8850cb8a770bc96cef17a003e2fc \
@@ -427,7 +427,7 @@ fastavro==1.12.2 \
     --hash=sha256:eec44256856fd59d29d1f1d0950ace18a58e4228e7d49de5d5e1b1875b227dde \
     --hash=sha256:f089f24225a28ddafa5cfad7c41cfa84db1a55f2d473370769a95c0e3bac60c9 \
     --hash=sha256:f604ba83498e209fff4c7ecc5063a39421dc538dace694bc592f9f338254f3dc
-    # via -r requirements.in
+    # via -r app/requirements.in
 google-auth==2.59.1 \
     --hash=sha256:89c3f931683a482ac97e61df7eb9da5e08a91703f3c752b2377d72cfb7d69e6a \
     --hash=sha256:ce50fc533ac02f489a2b183a0c156672c376ecb2091b1127bc7efba2975fff27
@@ -642,11 +642,11 @@ urllib3==2.8.0 \
     --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3 \
     --hash=sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63
     # via
-    #   -r requirements.in
+    #   -r app/requirements.in
     #   botocore
     #   databricks-sdk
     #   requests
 uvicorn==0.54.0 \
     --hash=sha256:505bdb0f318731d45f1f712071fc781a8981f6847a31c902c9f5e652d4f67faf \
     --hash=sha256:a2e33cbfaa0306f8e6b0c13e0cb89d7d7a2da3e62b90c66e18c33d9807b28620
-    # via -r requirements.in
+    # via -r app/requirements.in
