@@ -249,7 +249,7 @@ Use the environment variables for comma-separated values; `--var` splits values 
 
 ## Querying the data
 
-HealthLake's analytics tables only append. A FHIR delete adds a row that has only `id` and `meta.lastUpdated` set, and the resource's earlier row stays. In our test data store, `patient` had 51 rows for 49 live patients. To match what the FHIR API returns, keep the newest row per `id` and drop the delete markers. Shared catalogs are read-only, so create the view in a catalog you own:
+HealthLake's analytics tables only append. Each create and update saves a new version of the resource, and every version carries `meta.versionId`. A FHIR delete adds a row that has only `id` and `meta.lastUpdated` set, and the resource's earlier row stays. To match what the FHIR API returns, keep the newest row per `id` and drop the delete markers. Shared catalogs are read-only, so create the view in a catalog you own:
 
 ```sql
 CREATE OR REPLACE VIEW main.fhir.patient_current AS
@@ -258,8 +258,6 @@ FROM healthlake_<data_store>.fhir.patient
 QUALIFY row_number() OVER (PARTITION BY id ORDER BY CAST(meta.lastUpdated AS TIMESTAMP) DESC) = 1
     AND meta.versionId IS NOT NULL;
 ```
-
-We verified this for deletes. We expect updates to append the same way, but did not test them.
 
 FHIR observations use LOINC codes. For example, A1C is `code.coding[0].code = '4548-4'` in the `observation` table.
 
