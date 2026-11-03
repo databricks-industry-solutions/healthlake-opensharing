@@ -255,7 +255,7 @@ HealthLake's analytics tables only append. Each create, update, and delete adds 
 CREATE OR REPLACE VIEW main.fhir.patient_current AS
 SELECT *
 FROM healthlake_<data_store>.fhir.patient
-QUALIFY row_number() OVER (PARTITION BY id ORDER BY CAST(meta.lastUpdated AS TIMESTAMP) DESC) = 1
+QUALIFY row_number() OVER (PARTITION BY id ORDER BY meta.lastUpdated DESC) = 1
     AND coalesce(isdelete, false) = false;
 ```
 
